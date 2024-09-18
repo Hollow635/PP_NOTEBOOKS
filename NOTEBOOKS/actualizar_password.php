@@ -10,7 +10,7 @@ if (isset($_POST['change_password'])) {
 
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
-        $updateQuery = $conex->prepare("UPDATE usuarios SET contraseña = ? WHERE email = ?");
+        $updateQuery = $conex->prepare("UPDATE usuario SET contraseña = ? WHERE email = ?");
         $updateQuery->bind_param("ss", $hashed_password, $email);
 
         if ($updateQuery->execute()) {

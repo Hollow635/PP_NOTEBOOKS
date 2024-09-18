@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $sql = "SELECT contraseña, nombre FROM usuarios WHERE email = ?";
+    $sql = "SELECT contraseña, nombre FROM usuario WHERE email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<script>alert('El Email o Contraseña son incorrectos, intente nuevamente'); window.location.href='login.php';</script>";
         }
     } else {
-        $sql_prof = "SELECT contraseña, nombre FROM usuarios WHERE email = ?";
+        $sql_prof = "SELECT contraseña, nombre FROM usuario WHERE email = ?";
         $stmt_prof = $conn->prepare($sql_prof);
         $stmt_prof->bind_param("s", $email);
         $stmt_prof->execute();

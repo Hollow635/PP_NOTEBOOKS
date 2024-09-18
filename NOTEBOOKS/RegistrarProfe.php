@@ -2,6 +2,7 @@
 include("conexion.php");
 
 if (isset($_POST['register'])) {
+    // Verificamos si se llenaron todos los campos
     if (
         strlen($_POST['name']) >= 1 &&
         strlen($_POST['email']) >= 1 &&
@@ -12,8 +13,10 @@ if (isset($_POST['register'])) {
         $password = trim($_POST['password']);
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $fecha = date("Y-m-d");
+        $tipo_usuario = "Profesor";  // Asignar siempre como "Profesor"
 
-        $checkEmailQuery = $conex->prepare("SELECT * FROM usuarios WHERE email = ?");
+        // Verificar si el email ya está registrado
+        $checkEmailQuery = $conex->prepare("SELECT * FROM usuario WHERE email = ?");
         if (!$checkEmailQuery) {
             die("Error en la preparación de la consulta: " . $conex->error);
         }
@@ -30,9 +33,10 @@ if (isset($_POST['register'])) {
             <h3 class="error">El correo ya está registrado. Por favor, use un correo diferente.</h3>
             <?php
         } else {
-            $consulta = $conex->prepare("INSERT INTO usuarios(nombre, email, contraseña, fecha) VALUES (?, ?, ?, ?)");
+            // Modificar el INSERT para incluir el tipo de usuario como "Profesor"
+            $consulta = $conex->prepare("INSERT INTO usuario(nombre, email, contraseña, tipo_usuario, fecha) VALUES (?, ?, ?, ?, ?)");
             if ($consulta) { 
-                $consulta->bind_param("ssss", $name, $email, $hashed_password, $fecha);
+                $consulta->bind_param("sssss", $name, $email, $hashed_password, $tipo_usuario, $fecha);
                 if ($consulta->execute()) {
                     ?>
                     <h3 class="success">Tu registro como profesor se ha completado</h3>

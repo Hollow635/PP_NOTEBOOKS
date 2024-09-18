@@ -6,6 +6,7 @@ if (isset($_POST['register'])) {
     $division_valida = false;
     $especial_existe = isset($_POST['especial']) && strlen(trim($_POST['especial'])) >= 1;
 
+    // Validación de la división
     if (!preg_match('/^[\d°]+$/', $division)) {
         ?>
         <h3 class="error">La división debe contener solo números y el símbolo '°'.</h3>
@@ -16,11 +17,12 @@ if (isset($_POST['register'])) {
     $cleanDivision = str_replace('°', '', $division);
     $primer_digito = (int) substr($cleanDivision, 0, 1);
 
+    // Validación de la especialidad o ciclo básico
     if ($primer_digito >= 1 && $primer_digito <= 3) {
         $especialidad = "Ciclo Básico";
     } elseif ($primer_digito >= 4 && $primer_digito <= 6) {
         $division_valida = true;
-        $especialidad = $especial_existe ? trim($_POST['especial']) : '';  
+        $especialidad = $especial_existe ? trim($_POST['especial']) : 'Ciclo Básico';  
     } else {
         ?>
         <h3 class="error">El Año debe estar en el rango de 1 a 6.</h3>
@@ -28,6 +30,7 @@ if (isset($_POST['register'])) {
         exit();
     }
 
+    // Validación de campos completos
     if (
         strlen($_POST['name']) >= 1 &&
         strlen($_POST['email']) >= 1 &&
@@ -40,8 +43,10 @@ if (isset($_POST['register'])) {
         $password = trim($_POST['password']);
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $fecha = date("Y-m-d");
+        $tipo_usuario = "Alumno";  // Asignar el tipo de usuario siempre como "Alumno"
 
-        $checkEmailQuery = $conex->prepare("SELECT * FROM usuarios WHERE email = ?");
+        // Verificar si el email ya está registrado
+        $checkEmailQuery = $conex->prepare("SELECT * FROM usuario WHERE email = ?");
         if (!$checkEmailQuery) {
             die("Error en la preparación de la consulta: " . $conex->error);
         }
@@ -58,9 +63,10 @@ if (isset($_POST['register'])) {
             <h3 class="error">El correo ya está registrado. Por favor, use un correo diferente.</h3>
             <?php
         } else {
-            $consulta = $conex->prepare("INSERT INTO usuarios(nombre, email, contraseña, division, especialidad, fecha) VALUES (?, ?, ?, ?, ?, ?)");
+            // Preparar la consulta para insertar el nuevo alumno
+            $consulta = $conex->prepare("INSERT INTO usuario(nombre, email, contraseña, division, especialidad, tipo_usuario, fecha) VALUES (?, ?, ?, ?, ?, ?, ?)");
             if ($consulta) { 
-                $consulta->bind_param("ssssss", $name, $email, $hashed_password, $division, $especialidad, $fecha);
+                $consulta->bind_param("sssssss", $name, $email, $hashed_password, $division, $especialidad, $tipo_usuario, $fecha);
                 if ($consulta->execute()) {
                     ?>
                     <h3 class="success">Tu registro como alumno se ha completado</h3>
